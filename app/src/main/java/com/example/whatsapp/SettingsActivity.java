@@ -48,6 +48,8 @@ public class SettingsActivity extends AppCompatActivity {
 
         Initializefields();
 
+        userName.setVisibility(View.INVISIBLE);
+
 
         UpdateAccountSettings.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -153,6 +155,7 @@ public class SettingsActivity extends AppCompatActivity {
                         }
                         else
                         {
+                            userName.setVisibility(View.VISIBLE);
                             Toast.makeText(SettingsActivity.this, "Please set and update your profile information...", Toast.LENGTH_SHORT).show();
                         }
 
