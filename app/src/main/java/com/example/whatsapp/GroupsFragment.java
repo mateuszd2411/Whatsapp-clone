@@ -1,6 +1,7 @@
 package com.example.whatsapp;
 
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -8,6 +9,7 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
@@ -54,6 +56,20 @@ public class GroupsFragment extends Fragment {
         InitializeFields();
 
         RetrieveAndDisplayGroups();
+
+
+        list_view.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+
+                String currentGroupName = adapterView.getItemAtPosition(position).toString();
+
+                Intent groupChatIntent = new Intent(getContext(), GroupChatActivity.class);
+                groupChatIntent.putExtra("groupName", currentGroupName);
+                startActivity(groupChatIntent);
+
+            }
+        });
 
 
         return  groupFragmentView;
