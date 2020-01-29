@@ -28,7 +28,7 @@ public class ProfileActivity extends AppCompatActivity {
     private TextView userProfileName, userProfileStatus;
     private Button SendMessageRequestButton, DeclineMessageRequestButton;
 
-    private DatabaseReference UserRef, ChatRequestRef;
+    private DatabaseReference UserRef, ChatRequestRef, ContactsRef;
     private FirebaseAuth mAuth;
 
     @Override
@@ -39,6 +39,7 @@ public class ProfileActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         UserRef = FirebaseDatabase.getInstance().getReference().child("Users");
         ChatRequestRef = FirebaseDatabase.getInstance().getReference().child("Chat Requests");
+        ContactsRef = FirebaseDatabase.getInstance().getReference().child("Contacts");
 
 
         receiverUserID = getIntent().getExtras().get("visit_user_id").toString();
@@ -137,6 +138,28 @@ public class ProfileActivity extends AppCompatActivity {
                             }
                         }
 
+                        else
+                        {
+                            ContactsRef.child(senderUserID)
+                                    .addValueEventListener(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                                            if(dataSnapshot.hasChild(receiverUserID))
+                                            {
+                                                Current_State = "friends";
+                                                SendMessageRequestButton.setText("Remove this Contacts");
+                                            }
+
+                                        }
+
+                                        @Override
+                                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                        }
+                                    });
+                        }
+
                     }
 
                     @Override
@@ -161,6 +184,10 @@ public class ProfileActivity extends AppCompatActivity {
                     {
                         CancelChatRequest();
                     }
+                    if(Current_State.equals("request_received"))
+                    {
+                        AcceptChatRequest();
+                    }
 
                 }
             });
@@ -169,6 +196,66 @@ public class ProfileActivity extends AppCompatActivity {
         {
             SendMessageRequestButton.setVisibility(View.INVISIBLE);
         }
+
+    }
+
+    private void AcceptChatRequest() {
+
+
+        ContactsRef.child(senderUserID).child(receiverUserID)
+                .child("Contacts").setValue("Saved")
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+
+                        if(task.isSuccessful())
+                        {
+                            ContactsRef.child(receiverUserID).child(senderUserID)
+                                    .child("Contacts").setValue("Saved")
+                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> task) {
+
+                                            if(task.isSuccessful())
+                                            {
+
+                                                ChatRequestRef.child(senderUserID).child(receiverUserID)
+                                                        .removeValue()
+                                                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                            @Override
+                                                            public void onComplete(@NonNull Task<Void> task) {
+
+                                                                if(task.isSuccessful())
+                                                                {
+                                                                    ChatRequestRef.child(receiverUserID).child(senderUserID)
+                                                                            .removeValue()
+                                                                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                                                @Override
+                                                                                public void onComplete(@NonNull Task<Void> task) {
+
+
+                                                                                    SendMessageRequestButton.setEnabled(true);
+                                                                                    Current_State = "friends";
+                                                                                    SendMessageRequestButton.setText("Remove this Contact");
+
+                                                                                    DeclineMessageRequestButton.setVisibility(View.INVISIBLE);
+                                                                                    DeclineMessageRequestButton.setEnabled(false);
+
+                                                                                }
+                                                                            });
+                                                                }
+
+                                                            }
+                                                        });
+
+                                            }
+
+                                        }
+                                    });
+                        }
+
+                    }
+                });
 
     }
 
