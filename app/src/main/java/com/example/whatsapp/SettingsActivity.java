@@ -113,7 +113,7 @@ public class SettingsActivity extends AppCompatActivity {
         {
             Uri ImageUri = data.getData();
 
-            CropImage.activity()
+            CropImage.activity(ImageUri)
                     .setGuidelines(CropImageView.Guidelines.ON)
                     .setAspectRatio(1,1)
                     .start(this);
@@ -136,42 +136,43 @@ public class SettingsActivity extends AppCompatActivity {
 
                 StorageReference filePath = UserProfileImagesRef.child(currentUserID + ".jpg");
 
-                filePath.putFile(resultUri)
-                        .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                            @Override
-                            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                                final Task<Uri> firebaseUri = taskSnapshot.getStorage().getDownloadUrl();
-                                firebaseUri.addOnSuccessListener(new OnSuccessListener<Uri>() {
-                                    @Override
-                                    public void onSuccess(Uri uri) {
-                                        final String downloadUrl = uri.toString();
+                filePath.putFile(resultUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
 
-                                        RootRef.child("Users").child(currentUserID).child("image")
-                                                .setValue(downloadUrl)
-                                                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                    @Override
-                                                    public void onComplete(@NonNull Task<Void> task) {
-                                                        if(task.isSuccessful()){
-                                                            Toast.makeText(SettingsActivity.this, "Image saved in database successfuly", Toast.LENGTH_SHORT).show();
-                                                            loadingBar.dismiss();
-                                                        }
-                                                        else{
-                                                            String message = task.getException().toString();
-                                                            Toast.makeText(SettingsActivity.this, "Error: " + message,Toast.LENGTH_SHORT).show();
-                                                            loadingBar.dismiss();
+                        if(task.isSuccessful())
+                        {
+                            Toast.makeText(SettingsActivity.this, "Profile Image Uploaded Successfully.", Toast.LENGTH_SHORT).show();
+                            final String downloadedUrl = task.getResult().getStorage().getDownloadUrl().toString();
 
-                                                        }
+                            RootRef.child("Users").child(currentUserID).child("image")
+                                    .setValue(downloadedUrl)
+                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> task) {
 
-                                                    }
-                                                });
+                                            if(task.isSuccessful()){
+                                                Toast.makeText(SettingsActivity.this, "Image saved in database successfuly", Toast.LENGTH_SHORT).show();
+                                                loadingBar.dismiss();
+                                            }
+                                            else{
+                                                String message = task.getException().toString();
+                                                Toast.makeText(SettingsActivity.this, "Error: " + message,Toast.LENGTH_SHORT).show();
+                                                loadingBar.dismiss();
 
-                                    }
-                                });
+                                            }
 
-                            }
-                        });
+                                        }
+                                    });
+                        }
+                        else
+                        {
+                            String message = task.getException().toString();
+                            Toast.makeText(SettingsActivity.this, "Error: " + message, Toast.LENGTH_SHORT).show();
+                        }
 
-
+                    }
+                });
             }
 
         }
@@ -194,30 +195,30 @@ public class SettingsActivity extends AppCompatActivity {
         }
         else
         {
-                HashMap<String, String> profileMap = new HashMap<>();
-                profileMap.put("uid", currentUserID );
-                profileMap.put("name", setUserName );
-                profileMap.put("status", setStatus );
+            HashMap<String, String> profileMap = new HashMap<>();
+            profileMap.put("uid", currentUserID );
+            profileMap.put("name", setUserName );
+            profileMap.put("status", setStatus );
 
-                RootRef.child("Users").child(currentUserID).setValue(profileMap)
-                        .addOnCompleteListener(new OnCompleteListener<Void>() {
-                            @Override
-                            public void onComplete(@NonNull Task<Void> task) {
+            RootRef.child("Users").child(currentUserID).setValue(profileMap)
+                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
 
-                                if(task.isSuccessful())
-                                {
+                            if(task.isSuccessful())
+                            {
 
-                                    SendUserToMainActivity();
-                                    Toast.makeText(SettingsActivity.this, "Profile updated successfully...", Toast.LENGTH_SHORT).show();
-                                }
-                                else
-                                {
-                                    String message = task.getException().toString();
-                                    Toast.makeText(SettingsActivity.this, "Error: " + message , Toast.LENGTH_SHORT).show();
-                                }
-
+                                SendUserToMainActivity();
+                                Toast.makeText(SettingsActivity.this, "Profile updated successfully...", Toast.LENGTH_SHORT).show();
                             }
-                        });
+                            else
+                            {
+                                String message = task.getException().toString();
+                                Toast.makeText(SettingsActivity.this, "Error: " + message , Toast.LENGTH_SHORT).show();
+                            }
+
+                        }
+                    });
 
 
 
