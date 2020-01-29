@@ -14,6 +14,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -23,6 +24,7 @@ import com.google.firebase.database.ValueEventListener;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.Iterator;
 
 public class GroupChatActivity extends AppCompatActivity {
 
@@ -70,8 +72,52 @@ public class GroupChatActivity extends AppCompatActivity {
             }
         });
 
+
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+
+        GroupNameRef.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+
+                if(dataSnapshot.exists())
+                {
+                    DisplayMassages(dataSnapshot);
+                }
+
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+                if(dataSnapshot.exists())
+                {
+                    DisplayMassages(dataSnapshot);
+                }
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+    }
 
 
 
@@ -148,6 +194,25 @@ public class GroupChatActivity extends AppCompatActivity {
             GroupMessageKeyRef.updateChildren(messageInfoMap);
 
 
+        }
+
+    }
+
+
+    private void DisplayMassages(DataSnapshot dataSnapshot) {
+
+
+        Iterator iterator = dataSnapshot.getChildren().iterator();
+
+        while (iterator.hasNext())
+        {
+            String chatDate = (String) ((DataSnapshot)iterator.next()).getValue();
+            String chatMessage = (String) ((DataSnapshot)iterator.next()).getValue();
+            String chatName = (String) ((DataSnapshot)iterator.next()).getValue();
+            String chatTime = (String) ((DataSnapshot)iterator.next()).getValue();
+
+
+            displayTextMessages.append(chatName + " :\n" + chatMessage + "\n" + chatTime + "     " + chatDate + "\n\n\n");
         }
 
     }
