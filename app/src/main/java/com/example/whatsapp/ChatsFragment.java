@@ -1,6 +1,7 @@
 package com.example.whatsapp;
 
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -85,18 +86,35 @@ public class ChatsFragment extends Fragment {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
-                                if(dataSnapshot.hasChild("image"))
+                                if(dataSnapshot.exists())
                                 {
-                                    final String retImage = dataSnapshot.child("image").getValue().toString();
-                                    Picasso.get().load(retImage).into(holder.profileImage);
+                                    if(dataSnapshot.hasChild("image"))
+                                    {
+                                        final String retImage = dataSnapshot.child("image").getValue().toString();
+                                        Picasso.get().load(retImage).into(holder.profileImage);
+                                    }
+
+                                    final String retName = dataSnapshot.child("name").getValue().toString();
+                                    final String retStatus = dataSnapshot.child("status").getValue().toString();
+
+
+                                    holder.userName.setText(retName);
+                                    holder.userStatus.setText("Last Seen: " + "\n" + "Date " + " Time");
+
+
+                                    holder.itemView.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+
+                                            Intent chatIntent = new Intent(getContext(), ChatActivity.class);
+                                            chatIntent.putExtra("visit_user_id", usersIDs);
+                                            chatIntent.putExtra("visit_user_name", retName);
+                                            startActivity(chatIntent);
+
+                                        }
+                                    });
+
                                 }
-
-                                final String retName = dataSnapshot.child("name").getValue().toString();
-                                final String retStatus = dataSnapshot.child("status").getValue().toString();
-
-
-                                holder.userName.setText(retName);
-                                holder.userStatus.setText("Last Seen: " + "\n" + "Date " + " Time");
                             }
 
                             @Override
