@@ -8,14 +8,14 @@ import androidx.fragment.app.FragmentPagerAdapter;
 
 public class TabsAccessorAdapter extends FragmentPagerAdapter {
 
-    public TabsAccessorAdapter(@NonNull FragmentManager fm) {
+    public TabsAccessorAdapter(FragmentManager fm)
+    {
         super(fm);
     }
 
-    @NonNull
     @Override
-    public Fragment getItem(int i) {
-
+    public Fragment getItem(int i)
+    {
         switch (i)
         {
             case 0:
@@ -31,28 +31,28 @@ public class TabsAccessorAdapter extends FragmentPagerAdapter {
                 return contactsFragment;
 
             case 3:
-                ContactsFragment requestsFragment = new ContactsFragment();
+                RequestFragment requestsFragment = new RequestFragment();
                 return requestsFragment;
-
 
             default:
                 return null;
-
         }
-
-
     }
 
+
     @Override
-    public int getCount() {
+    public int getCount()
+    {
         return 4;
     }
 
 
     @Nullable
     @Override
-    public CharSequence getPageTitle(int position) {
-        switch (position) {
+    public CharSequence getPageTitle(int position)
+    {
+        switch (position)
+        {
             case 0:
                 return "Chats";
 
@@ -68,6 +68,5 @@ public class TabsAccessorAdapter extends FragmentPagerAdapter {
             default:
                 return null;
         }
-
     }
 }
