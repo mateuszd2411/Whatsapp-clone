@@ -132,6 +132,12 @@ public class SettingsActivity extends AppCompatActivity
             CropImage.ActivityResult result = CropImage.getActivityResult(data);
             if (resultCode == RESULT_OK)
             {
+
+                loadingBar.setTitle("Set Profile Image");
+                loadingBar.setMessage("Please wait");
+                loadingBar.setCanceledOnTouchOutside(false);
+                loadingBar.show();
+
                 Uri cropUri = result.getUri();
                 StorageReference filepath = UserProfileImagesRef.child(currentUserID + ".jpg");
 
