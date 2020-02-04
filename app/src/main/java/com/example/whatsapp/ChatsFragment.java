@@ -37,7 +37,7 @@ public class ChatsFragment extends Fragment {
 
     private DatabaseReference ChatsRef, UsersRef;
     private FirebaseAuth mAuth;
-    private String currentUserID;
+    private String currentUserID="";
 
 
 
